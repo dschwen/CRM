@@ -99,7 +99,8 @@ class Family
                         if($this->_nAdultMale == 1 && $this->_nAdultFemale == 1)
                         {
                             // find head / spouse
-                            if(($this->Members[$m]['gender'] == 1 && $this->_type == 0) || ($this->Members[$m]['gender'] == 2 && $this->_type == 1))
+                            if(($this->Members[$m]['gender'] == 1 && $this->_type == 0) ||
+                               ($this->Members[$m]['gender'] == 2 && $this->_type == 1))
                             {
                                 $this->Members[$m]['role'] = 1;
                                 if($this->Members[$m]['phone'] != "") $this->Phone = $this->Members[$m]['phone'];
@@ -576,18 +577,19 @@ if (isset($_POST["DoImport"]))
             }
 
             // Finish up the person_per SQL..
-            $sSQLpersonData .= $iClassID . ",'" . addslashes($sCountry) . "',";
-            $sSQLpersonData .= "'" . date("YmdHis") . "'," . $_SESSION['iUserID'];
-            $sSQLpersonData .= ")";
+            $sSQLpersonData .= $iClassID . ",'" . addslashes($sCountry) . "',
+                               '" . date("YmdHis") . "'," . $_SESSION['iUserID'] .
+                               ")";
 
-            $sSQLpersonFields .= "per_cls_ID, per_Country, per_DateEntered, per_EnteredBy";
-            $sSQLpersonFields .= ")";
+            $sSQLpersonFields .= "per_cls_ID, per_Country, per_DateEntered, per_EnteredBy" .
+                                 ")";
+
             $sSQLperson = $sSQLpersonFields . $sSQLpersonData;
-
             RunQuery($sSQLperson);
 
             // Make a one-person family if requested
-            if (isset($_POST["MakeFamilyRecords"])) {
+            if (isset($_POST["MakeFamilyRecords"]))
+            {
                 $sSQL = "SELECT MAX(per_ID) AS iPersonID FROM person_per";
                 $rsPersonID = RunQuery($sSQL);
                 extract(mysql_fetch_array($rsPersonID));
@@ -600,9 +602,11 @@ if (isset($_POST["DoImport"]))
                 {
                     // ...with same last name and address
                     $sSQL = "SELECT fam_ID
-                             FROM family_fam where fam_Name = '".addslashes($per_LastName)."'
-                             AND fam_Address1 = '".$sAddress1."'"; // slashes added already
-                } else {
+                             FROM family_fam where fam_Name = '" . addslashes($per_LastName)."'
+                             AND fam_Address1 = '" . $sAddress1 . "'"; // slashes added already
+                }
+                else
+                {
                     // ...with the same custom field values
                     $field = $_POST["MakeFamilyRecordsMode"];
                     $field_value = '';
@@ -870,25 +874,30 @@ if ($iStage == 1)
     echo '
         <p style="color: red">' . $csvError . '</p>
         <form method="post" action="CSVImport.php" enctype="multipart/form-data">
-        <input class="icTinyButton" type="file" name="CSVfile">
-        <input type="submit" class="icButton" value="' . gettext("Upload CSV File") . '"
-        name="UploadCSV">
-        </form><br/><br/><br/><br/>
+            <input class="icTinyButton" type="file" name="CSVfile">
+            <input type="submit" class="icButton" value="' . gettext("Upload CSV File") . '"
+                name="UploadCSV">
+        </form>
+        <br/><br/><br/><br/>
         <form method="post" action="CSVImport.php" enctype="multipart/form-data">'
-        .gettext("Are you sure?"). '
-        <input type="checkbox" name="chkClear" value=' . "'0'>" . '
-        <input type="submit" class="icButton" value="'. gettext("Clear Persons and Families").'"
-        name="Clear">
-        <p style="color: red">' .
-        gettext("Warning!  Do not select this option if you plan to add to an existing database.<br/>") .
-        gettext("Use only if unsatisfied with initial import.  All person and member data will be destroyed!");
-    echo '</p></form>';
+            .gettext("Are you sure?"). '
+            <input type="checkbox" name="chkClear" value=' . "'0'>" . '
+            <input type="submit" class="icButton" value="'. gettext("Clear Persons and Families").'"
+            name="Clear">
+            <p style="color: red">' .
+                gettext("Warning!  Do not select this option if you plan to add to an existing database.<br/>") .
+                gettext("Use only if unsatisfied with initial import.  All person and member data will be destroyed!") .
+           '</p>
+       </form>';
+
     echo $sClear;
 }
 
 if ($iStage == 3)
 {
-    echo "<p class=\"MediumLargeText\">" . gettext("Data import successful.") . ' ' . $importCount . ' ' . gettext("persons were imported") . "</p>";
+    echo "<p class=\"MediumLargeText\">" .
+            gettext("Data import successful.") . ' ' . $importCount . ' ' . gettext("persons were imported") .
+         "</p>";
 }
 
 // Returns a date array [year,month,day]
@@ -913,12 +922,12 @@ function ParseDate($sDate,$iDateMode)
             // Remove separator if it exists
             if (!is_numeric($cSeparator))
                 $sDate = str_replace($cSeparator,"",$sDate);
-             if(strlen($sDate) == 8)
-             {
+            if(strlen($sDate) == 8)
+            {
                 $aDate[0] = substr($sDate,0,4);
                 $aDate[1] = substr($sDate,4,2);
                 $aDate[2] = substr($sDate,6,2);
-             }
+            }
             break;
 
         // MM-DD-YYYY
@@ -927,9 +936,9 @@ function ParseDate($sDate,$iDateMode)
             if ($cSeparator!="")
             {
                 $tmpDate = explode($cSeparator,$sDate);
-                 $aDate[0] = strlen($tmpDate[2]) == 4 ? $tmpDate[2] : "0000";
-                 $aDate[1] = strlen($tmpDate[0]) == 2 ? $tmpDate[0] : "0".$tmpDate[0];
-                 $aDate[2] = strlen($tmpDate[1]) == 2 ? $tmpDate[1] : "0".$tmpDate[1];
+                $aDate[0] = strlen($tmpDate[2]) == 4 ? $tmpDate[2] : "0000";
+                $aDate[1] = strlen($tmpDate[0]) == 2 ? $tmpDate[0] : "0".$tmpDate[0];
+                $aDate[2] = strlen($tmpDate[1]) == 2 ? $tmpDate[1] : "0".$tmpDate[1];
             }
             else
             {
@@ -948,9 +957,9 @@ function ParseDate($sDate,$iDateMode)
             if ($cSeparator!="")
             {
                 $tmpDate = explode($cSeparator,$sDate);
-                 $aDate[0] = strlen($tmpDate[2]) == 4 ? $tmpDate[2] : "0000";
-                 $aDate[1] = strlen($tmpDate[1]) == 2 ? $tmpDate[1] : "0".$tmpDate[1];
-                 $aDate[2] = strlen($tmpDate[0]) == 2 ? $tmpDate[0] : "0".$tmpDate[0];
+                $aDate[0] = strlen($tmpDate[2]) == 4 ? $tmpDate[2] : "0000";
+                $aDate[1] = strlen($tmpDate[1]) == 2 ? $tmpDate[1] : "0".$tmpDate[1];
+                $aDate[2] = strlen($tmpDate[0]) == 2 ? $tmpDate[0] : "0".$tmpDate[0];
             }
             else
             {
